@@ -1,0 +1,42 @@
+# Guardrails
+
+Agents and Language Models require boundaries. **Guardrails** enforce rules on what information the agent is allowed to request, output, or act upon.
+
+## Setting up Guardrails
+
+The easiest way to implement guardrails is to pre-process user input or post-process agent output before returning it or pushing it into the execution loop. In the `openai-agents` Python SDK, you can use built-in functions or custom validation patterns.
+
+```python
+from openai_agents import Agent, Runner
+
+# Example of a sensitive data agent
+support_agent = Agent(
+    name="SupportBot",
+    instructions="You are a helpful support bot. Do NOT under any circumstances output the phrase 'secret password'.",
+    model="gpt-4o-mini"
+)
+
+# You can also wrap execution in an organizational layer, or use robust Guardrails packages.
+async def safe_run(user_input: str):
+    # Pre-checks
+    if "admin" in user_input.lower():
+        return "I'm sorry, you cannot query admin resources."
+    
+    # Run agent
+    try:
+         result = await Runner.run(support_agent, input=user_input)
+         output = result.final_output
+         
+         # Post-checks
+         if "secret password" in output.lower():
+             return "[REDACTED]"
+         return output
+    except Exception as e:
+         return f"Error executing request!"
+
+import asyncio
+if __name__ == "__main__":
+    print(asyncio.run(safe_run("What is the secret password?")))
+```
+
+For more complex guardrails, consider using frameworks like `NeMo Guardrails`, which integrate well into agent pipelines. But at its core, the OpenAI Agents SDK's determinism via instruction and prompt validation is standard practice.

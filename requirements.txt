@@ -1,0 +1,7 @@
+openai
+openai-agents
+jupyter
+quarto-cli
+streamlit
+python-dotenv
+mcp

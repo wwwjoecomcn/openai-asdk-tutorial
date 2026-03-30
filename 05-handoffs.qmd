@@ -1,0 +1,48 @@
+# Handoffs (Multi-Agent Orchestration)
+
+One agent can only do so much. A core design pattern in modern AI systems is the **Triage and Handoff** pattern, where a router agent directs queries to specialized agents.
+
+## Implementing a Handoff
+
+In the `openai-agents` Python SDK, you can return another `Agent` directly from a tool to initiate a handoff!
+
+```python
+from openai_agents import Agent, Runner, tool
+import asyncio
+
+# The specialized agent
+support_agent = Agent(
+    name="SupportSpecialist",
+    instructions="You help users with billing issues.",
+    model="gpt-4o-mini"
+)
+
+# Tool that hands off to the specialist
+@tool
+async def handoff_to_support() -> Agent:
+    """Call this tool to transfer the user to the billing support specialist."""
+    return support_agent
+
+# The Router / Triage agent
+triage_agent = Agent(
+    name="TriageAgent",
+    instructions="Determine what the user needs. If it's a billing issue, transfer them to support.",
+    tools=[handoff_to_support],
+    model="gpt-4o-mini"
+)
+
+async def main():
+    result = await Runner.run(
+        triage_agent, 
+        input="I need a refund for my last invoice."
+    )
+    
+    # The SDK automatically invokes the handoff and runs the SupportSpecialist!
+    print(f"Final Agent that answered: {result.agent.name}")
+    print(f"Response: {result.final_output}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+This pattern drastically reduces the cognitive load on a single model and improves determinism.
