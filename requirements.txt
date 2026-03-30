@@ -1,7 +1,9 @@
 openai
 openai-agents
 jupyter
-quarto-cli
+jupyterlab_rise
+nest_asyncio
 streamlit
 python-dotenv
+ipywidgets
 mcp

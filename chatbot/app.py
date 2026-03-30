@@ -8,7 +8,7 @@ from agents import Agent, Runner
 from agents.mcp import MCPServerStdio
 
 # Local imports
-from agents import triage_agent, search_agent, support_agent, search_weather
+from bot_agents import triage_agent, search_agent, search_weather
 
 load_dotenv()
 

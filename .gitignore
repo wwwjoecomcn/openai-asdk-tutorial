@@ -59,3 +59,6 @@ test_pipeline.py
 test_run.py
 test_run_agent.py
 test_pipeline.log
+
+/.quarto/
+**/*.quarto_ipynb
